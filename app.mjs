@@ -64,6 +64,6 @@ function render(now){if(!frame||!owner)return;if(sceneDirty)cacheScene();ctx=mai
 canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,yaw,pitch};canvas.setPointerCapture(e.pointerId);};canvas.onpointermove=e=>{if(!drag)return;yaw=drag.yaw+(e.clientX-drag.x)*.008;pitch=Math.max(.05,Math.min(1.5,drag.pitch+(e.clientY-drag.y)*.008));requestRender();};canvas.onpointerup=canvas.onpointercancel=()=>drag=null;canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.5,Math.min(2,zoom*Math.exp(-e.deltaY*.001)));requestRender();},{passive:false});
 initialise();
 
-let fpsStart=0,paintCount=0,lastPaint=0;
-function animate(now){requestAnimationFrame(animate);const delta=now-lastPaint;if(delta<1000/60-.5)return;lastPaint=now-(delta%(1000/60));render(now);if(frame&&owner)paintCount++;if(!fpsStart)fpsStart=now;if(now-fpsStart>=1000){$('renderFps').textContent=(paintCount*1000/(now-fpsStart)).toFixed(0);fpsStart=now;paintCount=0;}}
+let fpsStart=0,paintCount=0,lastPaint=0,paintMs=0;
+function animate(now){requestAnimationFrame(animate);const delta=now-lastPaint;if(delta<1000/60-.5)return;lastPaint=now-(delta%(1000/60));const paintStart=performance.now();render(now);if(frame&&owner){paintCount++;paintMs+=performance.now()-paintStart;}if(!fpsStart)fpsStart=now;if(now-fpsStart>=1000){$('renderFps').textContent=(paintCount*1000/(now-fpsStart)).toFixed(0);$('renderMs').textContent=paintCount?(paintMs/paintCount).toFixed(1)+' ms':'—';fpsStart=now;paintCount=0;paintMs=0;}}
 requestAnimationFrame(animate);
