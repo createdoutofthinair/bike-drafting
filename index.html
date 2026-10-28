@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peloton Flow Lab · Physics audit</title><link rel="stylesheet" href="style.css?v=20261028-live3"></head><body>
 <header><div><h1>◈ &nbsp; Peloton / Flow Lab</h1><p>Open-air formation explorer</p></div><span class="badge">EXPERIMENTAL FLUID SOLVER</span></header>
-<main><aside>
+<div class="note" style="margin:16px 20px"><b>Native GPU CFD backend:</b> an OpenCL integration is available in the repository. <a href="https://github.com/createdoutofthinair/bike-drafting/blob/main/native/README.md">Build and run it on a supported GPU ↗</a>. This page still runs the unvalidated JavaScript preview; native GPU physics is not hosted by GitHub Pages.</div><main><aside>
 <h2>Riding conditions</h2><label for="formation">Formation</label><select id="formation"><option value="single">One rider</option><option value="line" selected>Paceline · 3 riders</option><option value="double">Double line · 4 riders</option><option value="stagger">Staggered · 3 riders</option></select>
 <label for="gap">Wheel-to-wheel gap <output id="gapVal">0.50 m</output></label><input id="gap" type="range" min="0.25" max="1" step="0.25" value="0.5">
 <label for="ride">Riding speed <output id="rideVal">35 km/h</output></label><input id="ride" type="range" min="10" max="50" step="1" value="35">

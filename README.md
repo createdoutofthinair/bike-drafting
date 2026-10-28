@@ -1,5 +1,7 @@
 # Peloton Flow Lab
 
+A native OpenCL GPU backend is now available under [native/](native/README.md), using a pinned FluidX3D engine with D3Q27, subgrid modelling, moving ground, per-rider force reduction and native Q-criterion rendering. The public browser page remains a JavaScript preview; it does not run the native GPU backend. See the native verification workflow for actual build/run status.
+
 An experimental 3D fluid-flow explorer for cycling formations. The CPU worker solves D3Q19 TRT lattice Boltzmann around SI-sized rider/bike proxies and reports numerical health and provisional load comparisons. It is **not validated cycling CFD**. In particular, its simulated Reynolds number is far below real cycling conditions.
 
 Open [the app](https://createdoutofthinair.github.io/bike-drafting/). Run locally with `python -m http.server 8000`, then visit `http://localhost:8000`. ES modules and workers require HTTP (not `file://`). Run numerical checks with `node tests.mjs`. The optional `node long-test.mjs` repeats the full-resolution 1,000-step group/reference stability run (it can take several minutes).

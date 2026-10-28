@@ -1,0 +1,60 @@
+name: Native OpenCL CFD verification
+on:
+  push:
+    branches: [main]
+    paths: ['native/**', '.github/workflows/native-cfd.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  opencl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install compiler and CPU OpenCL runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends g++ make ocl-icd-opencl-dev pocl-opencl-icd
+      - name: Fetch reviewed upstream solver
+        uses: actions/checkout@v4
+        with:
+          repository: ProjectPhysX/FluidX3D
+          ref: dbf0bb5b19233668672f73a0865a41424651a09c
+          path: external/FluidX3D
+      - name: Configure original peloton integration
+        run: python3 native/configure.py external/FluidX3D
+      - name: Compile native OpenCL engine
+        working-directory: external/FluidX3D
+        run: make Linux -j2
+      - name: Execute same OpenCL kernels on CPU for portability verification
+        working-directory: external/FluidX3D
+        env:
+          VRAM_MB: 32
+          RIDERS: 1
+          MAX_STEPS: 64
+          SAMPLE_STEPS: 16
+          IMAGE_STEPS: 64
+          OUTPUT_DIR: /tmp/peloton-native-result
+        run: timeout 300 bin/FluidX3D
+      - name: Check solver output
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, csv
+          p=pathlib.Path('/tmp/peloton-native-result')
+          s=json.loads((p/'status.json').read_text())
+          assert s['completed_steps']==64 and s['finite']
+          assert len(list(csv.DictReader((p/'forces.csv').open())))==4
+          print(s)
+          PY
+      - name: Preserve results and reconstructable altered source
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-opencl-smoke-test-not-validated
+          path: |
+            /tmp/peloton-native-result/
+            external/FluidX3D/src/setup.cpp
+            external/FluidX3D/src/defines.hpp
+            external/FluidX3D/LICENSE.md
+          if-no-files-found: warn
