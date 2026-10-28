@@ -45,5 +45,41 @@
       "status": "pass",
       "ms": 85
     }
-  ]
+  ],
+  "fullResolutionRun": {
+    "steps": 1000,
+    "referenceSteps": 1000,
+    "conditionChangeAtStep": 500,
+    "conditionsAfterChange": {
+      "rideKmh": 35,
+      "ambientWindKmh": 20,
+      "directionDegrees": 90
+    },
+    "status": "pass",
+    "noReset": true,
+    "group": {
+      "meanDensity": 1.0039708912017107,
+      "minDensity": 0.9999999757856131,
+      "maxDensity": 1.0124529171735048,
+      "maxMach": 0.07223365346650075
+    },
+    "reference": {
+      "meanDensity": 1.0039678970691674,
+      "minDensity": 0.9999999739229679,
+      "maxDensity": 1.0121842231601477,
+      "maxMach": 0.07234201820114647
+    },
+    "forceComparisonReady": false,
+    "note": "Stability check only, not physical validation or steady-state convergence."
+  },
+  "browserVerification": {
+    "url": "https://createdoutofthinair.github.io/bike-drafting/",
+    "checks": [
+      "Audited interface and worker load",
+      "Step count advanced from 4 to 60 to 80 while changing ambient wind",
+      "Changing comparison basis updates explanation without reset",
+      "Pause at step 120; resume preserved the state"
+    ],
+    "status": "pass"
+  }
 }
