@@ -16,13 +16,13 @@ bool rider_si(float x,float y,float z){
  const bool head=sq((x+.43f)/.14f)+sq(y/.13f)+sq((z-1.24f)/.16f)<1.0f;
  bool legs=false,arms=false;for(float side:{-1.0f,1.0f}){legs|=capsule_si(x,y,z,float3(.25f,side*.12f,.88f),float3(.05f,side*.12f,.40f),.09f);arms|=capsule_si(x,y,z,float3(-.25f,side*.20f,1.05f),float3(-.57f,side*.20f,.72f),.065f);}
  const bool wheels=(std::hypot(x+.52f,z-.34f)<=.34f||std::hypot(x-.52f,z-.34f)<=.34f)&&std::fabs(y)<.055f;
- const bool frame=capsule_si(x,y,z,float3(-.52f,0,.34f),float3(.12f,0,.68f),.055f)||capsule_si(x,y,z,float3(.12f,0,.68f),float3(.52f,0,.34f),.055f);
+ const bool frame=capsule_si(x,y,z,float3(-.52f,0.0f,.34f),float3(.12f,0.0f,.68f),.055f)||capsule_si(x,y,z,float3(.12f,0.0f,.68f),float3(.52f,0.0f,.34f),.055f);
  return torso||head||legs||arms||wheels||frame;
 }
 }
 void main_setup(){
  const uint budget=(uint)env_number("VRAM_MB",2048),riders=(uint)env_number("RIDERS",3);
- const float ride=(float)env_number("RIDE_KMH",35)/3.6f,wind=(float)env_number("WIND_KMH",0)/3.6f,angle=(float)env_number("WIND_DEG",0)*pif/180.0f;
+ const float ride=(float)env_number("RIDE_KMH",35)/3.6f,wind=(float)env_number("WIND_KMH",0.0f)/3.6f,angle=(float)env_number("WIND_DEG",0.0f)*pif/180.0f;
  const float gap=(float)env_number("GAP_M",.5),rho=1.225f,nu_si=1.5E-5f;
  const float3 si_u=float3(ride+wind*std::cos(angle),wind*std::sin(angle),0.0f);
  const float speed=length(si_u),scale_speed=std::fmax(std::fmax(speed,ride),1.0f),lattice_speed=.06f;
@@ -31,9 +31,9 @@ void main_setup(){
  units.set_m_kg_s((float)dims.x,lattice_speed,1.0f,32.0f,scale_speed,rho);
  const float nu=units.nu(nu_si);LBM lbm(dims,nu);
  const uint Nx=lbm.get_Nx(),Ny=lbm.get_Ny(),Nz=lbm.get_Nz();
- const float3 u=float3(units.u(si_u.x),units.u(si_u.y),0),road=float3(units.u(ride),0,0);
+ const float3 u=float3(units.u(si_u.x),units.u(si_u.y),0.0f),road=float3(units.u(ride),0.0f,0.0f);
  const uchar markers[3]={uchar(TYPE_S|TYPE_X),uchar(TYPE_S|TYPE_Y),uchar(TYPE_S|TYPE_X|TYPE_Y)};
- std::vector<float3> centers;for(uint r=0;r<riders;r++)centers.push_back(float3(.25f*Nx+units.x((1.75f+gap)*r),.5f*Ny,0));
+ std::vector<float3> centers;for(uint r=0;r<riders;r++)centers.push_back(float3(.25f*Nx+units.x((1.75f+gap)*r),.5f*Ny,0.0f));
  parallel_for(lbm.get_N(),[&](ulong n){uint x,y,z;lbm.coordinates(n,x,y,z);lbm.u.x[n]=u.x;lbm.u.y[n]=u.y;lbm.u.z[n]=0;
    if(z==0){lbm.flags[n]=TYPE_S;lbm.u.x[n]=road.x;lbm.u.y[n]=0;return;}
    if(x==0||x==Nx-1||y==0||y==Ny-1||z==Nz-1){lbm.flags[n]=TYPE_E;return;}
