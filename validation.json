@@ -102,5 +102,22 @@
     "solverPublishesEveryStep": true,
     "percentages": "Provisional after 8 samples; existing settling criteria retained",
     "physicsChange": "No change to collision, boundary or force kernel; added a preview-force running average"
+  },
+  "nativeOpenCLVerification": {
+    "integrationCommit": "26e008e482742430eb9cadf002cc2c01e3cf843e",
+    "upstreamCommit": "dbf0bb5b19233668672f73a0865a41424651a09c",
+    "workflow": "https://github.com/createdoutofthinair/bike-drafting/actions/runs/40681166039",
+    "result": "success",
+    "executionDevice": "CPU OpenCL: Intel Xeon Platinum 8573C via POCL",
+    "gpuHardwareTested": false,
+    "completedSteps": 64,
+    "riders": 1,
+    "memoryBudgetMB": 32,
+    "finiteFields": true,
+    "densityMin": 0.981119,
+    "densityMax": 1.01386,
+    "maxLatticeSpeed": 0.0806082,
+    "forceSamples": 4,
+    "aerodynamicValidation": false
   }
 }
