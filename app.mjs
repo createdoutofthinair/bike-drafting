@@ -1,6 +1,6 @@
-import {blendFraction,loadComparison} from './display.mjs';
+import {blendFraction,loadComparison} from './display.mjs?v=20261028-live3';
 const $=id=>document.getElementById(id),canvas=$('view'),mainCtx=canvas.getContext('2d');let ctx=mainCtx;
-const worker=new Worker(new URL('./worker.mjs',import.meta.url),{type:'module'});
+const worker=new Worker(new URL('./worker.mjs?v=20261028-live3',import.meta.url),{type:'module'});
 let frame=null,owner=null,faces=[],yaw=-.7,pitch=.58,zoom=1,drag=null,fields=[],previousFields=[],transitionStart=0,transitionDuration=200,lastSnapshotAt=0,lastSolverAt=0,lastSolverStep=0,solverRate=0,sceneDirty=true;
 const background=document.createElement('canvas'),bodies=document.createElement('canvas'),mix=document.createElement('canvas');for(const c of [background,bodies]){c.width=1000;c.height=560;}
 function conditions(){return {ride:+$('ride').value,wind:+$('wind').value,angle:+$('angle').value,latticeNu:+$('viscosity').value};}

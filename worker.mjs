@@ -1,4 +1,4 @@
-import {Solver} from './solver.mjs';
+import {Solver} from './solver.mjs?v=20261028-live3';
 let group,reference,paused=false,timer=null,error=null,epoch=0;
 function emit(initial=false){if(!group)return;const velocity=group.snapshot(),gs=group.statistics(),rs=reference.statistics();
   const data={type:'frame',epoch,steps:group.steps,nx:group.nx,ny:group.ny,nz:group.nz,dx:group.dx,
