@@ -1,0 +1,49 @@
+{
+  "tests": [
+    {
+      "name": "D3Q19 isotropy, opposite links and equilibrium moments",
+      "status": "pass",
+      "ms": 0
+    },
+    {
+      "name": "Headwind, crosswind, following wind and SI scaling",
+      "status": "pass",
+      "ms": 2
+    },
+    {
+      "name": "Uniform moving flow + matching moving road remains uniform",
+      "status": "pass",
+      "ms": 2360
+    },
+    {
+      "name": "Symmetric stationary rider in still air has zero net force",
+      "status": "pass",
+      "ms": 887
+    },
+    {
+      "name": "Independent identical group/reference states give equal forces",
+      "status": "pass",
+      "ms": 3664
+    },
+    {
+      "name": "Condition changes preserve time and fluid state; convergence is invalidated",
+      "status": "pass",
+      "ms": 2583
+    },
+    {
+      "name": "Ground speed does not wrongly include ambient wind",
+      "status": "pass",
+      "ms": 0
+    },
+    {
+      "name": "Stable force history alone cannot pass the flow-through requirement",
+      "status": "pass",
+      "ms": 81
+    },
+    {
+      "name": "Numerical failure preserves the committed field and step count",
+      "status": "pass",
+      "ms": 85
+    }
+  ]
+}
