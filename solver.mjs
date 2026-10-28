@@ -31,7 +31,7 @@ export class Solver {
     this.f=new Float32Array(this.n*19);this.g=new Float32Array(this.n*19);
     this.owner=new Uint8Array(this.n);this.positions=empty?[]:layout(kind,gap,dx,nx,ny);if(reference)this.positions=this.positions.slice(0,1);
     this.steps=0;this.target=[0,0,0];this.u=[0,0,0];this.road=0;this.targetRoad=0;this.age=0;this.travel=0;this.blocks=[];this.block=[];
-    this.force=new Float64Array(this.positions.length*3);this.buildGeometry();this.setConditions({ride:35,wind:0,angle:0,latticeNu},true);
+    this.force=new Float64Array(this.positions.length*3);this.previewForce=new Float64Array(this.positions.length*3);this.buildGeometry();this.setConditions({ride:35,wind:0,angle:0,latticeNu},true);
   }
   id(x,y,z){return (z*this.ny+y)*this.nx+x;}
   buildGeometry(){const {nx,ny,nz,dx}=this;
@@ -52,7 +52,7 @@ export class Solver {
   }
   setConditions({ride=35,wind=0,angle=0,latticeNu=this.latticeNu},initial=false){
     this.config={ride,wind,angle,latticeNu};this.units=scales({...this.config,dx:this.dx});this.target=this.units.velocity;this.targetRoad=this.units.groundSpeed;this.latticeNu=latticeNu;
-    this.age=0;this.travel=0;this.blocks=[];this.block=[];
+    this.age=0;this.travel=0;this.blocks=[];this.block=[];this.previewForce.fill(0);
     if(initial){this.u=[...this.target];this.road=this.targetRoad;for(let i=0;i<this.n;i++)for(let q=0;q<19;q++)this.f[i*19+q]=equilibrium(q,1,...this.u);}
   }
   macroAt(i,buffer=this.f){let r=0,x=0,y=0,z=0,b=i*19;for(let q=0;q<19;q++){let v=buffer[b+q];r+=v;x+=v*C[q][0];y+=v*C[q][1];z+=v*C[q][2];}return [r,x/r,y/r,z/r];}
@@ -93,14 +93,14 @@ export class Solver {
       for(let q=0;q<19;q++)g[b+q]=equilibrium(q,r,ux,uy,uz)+g[j*19+q]-equilibrium(q,...m);
     }
     this.f=g;this.g=f;this.steps++;this.age++;this.travel+=Math.hypot(...this.u)/Math.max(nx,ny);
-    this.force=force;this.diagnostics={meanDensity:mass/fluid,minDensity:minR,maxDensity:maxR,maxMach:maxSpeed*Math.sqrt(3)};
+    this.force=force;for(let k=0;k<force.length;k++)this.previewForce[k]=this.age===1?force[k]:this.previewForce[k]*.9+force[k]*.1;this.diagnostics={meanDensity:mass/fluid,minDensity:minR,maxDensity:maxR,maxMach:maxSpeed*Math.sqrt(3)};
     this.block.push([...force]);
     if(this.block.length===128){let mean=Array(force.length).fill(0);for(const a of this.block)for(let k=0;k<a.length;k++)mean[k]+=a[k]/128;this.blocks.push(mean);if(this.blocks.length>4)this.blocks.shift();this.block=[];}
   }
   statistics(){
     const n=this.blocks.length,mean=Array(this.force.length).fill(0);for(const b of this.blocks)for(let k=0;k<mean.length;k++)mean[k]+=b[k]/n;
     let drift=Infinity;if(n===4){drift=0;for(let k=0;k<mean.length;k+=3)drift=Math.max(drift,Math.abs(this.blocks[3][k]-this.blocks[2][k])/Math.max(Math.abs(mean[k]),1e-5));}
-    return {mean,drift,ready:this.travel>=2&&n===4&&drift<.03,flowThroughs:this.travel,blocks:n};
+    return {mean,provisionalMean:[...this.previewForce],previewAvailable:this.age>=8,drift,ready:this.travel>=2&&n===4&&drift<.03,flowThroughs:this.travel,blocks:n};
   }
   snapshot(){const velocity=new Float32Array(this.n*3);for(let i=0;i<this.n;i++){if(this.owner[i])continue;const m=this.macroAt(i);for(let k=0;k<3;k++)velocity[i*3+k]=Number.isFinite(m[k+1])?m[k+1]:0;}return velocity;}
 }

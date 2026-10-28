@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {Solver,C,O,W,equilibrium,windVector,scales} from './solver.mjs';
+import {blendFraction,loadComparison} from './display.mjs';
 const results=[];function test(name,fn){let start=performance.now();fn();results.push({name,status:'pass',ms:Math.round(performance.now()-start)});}
 function small(options={}){return new Solver({nx:40,ny:24,nz:20,dx:.25,kind:'single',...options});}
 test('D3Q19 isotropy, opposite links and equilibrium moments',()=>{
@@ -46,5 +47,17 @@ test('Numerical failure preserves the committed field and step count',()=>{
   const s=small();let i=s.id(20,12,10);s.owner[i]=0;s.f[i*19]=NaN;
   const count=s.steps,field=s.f;assert.throws(()=>s.step(),/Numerical limit exceeded/);
   assert.equal(s.steps,count);assert.equal(s.f,field);
+});
+test('Provisional force estimates appear early without claiming convergence',()=>{
+  const s=small();for(let t=0;t<8;t++)s.step();const stats=s.statistics();assert.equal(stats.previewAvailable,true);assert.equal(stats.ready,false);
+  const frame={positions:[[0,0]],statistics:stats,reference:stats};const c=loadComparison(frame,false);assert.equal(c.available,true);assert.equal(c.ready,false);assert.ok(Math.abs(c.values[0])<1e-10);
+  s.setConditions({ride:36,wind:10,angle:90});assert.equal(s.statistics().previewAvailable,false);
+});
+test('Display blending clamps to known snapshots and freezes when paused',()=>{
+  assert.equal(blendFraction(50,100,200),0);assert.equal(blendFraction(200,100,200),.5);assert.equal(blendFraction(500,100,200),1);assert.equal(blendFraction(150,100,200,true),1);
+});
+test('Group and isolated reference comparisons use their selected basis',()=>{
+  const frame={positions:[[0,0],[1,0]],statistics:{ready:false,previewAvailable:true,provisionalMean:[1,0,0,.6,0,0]},reference:{ready:false,previewAvailable:true,provisionalMean:[1.2,0,0]}};
+  assert.ok(Math.abs(loadComparison(frame,false).values[1]-40)<1e-10);assert.ok(Math.abs(loadComparison(frame,true).values[0]-100/6)<1e-10);
 });
 console.log(JSON.stringify({tests:results},null,2));

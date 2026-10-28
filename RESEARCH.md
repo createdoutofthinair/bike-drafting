@@ -49,7 +49,7 @@ The new boundary is still an approximation, including face intersections and zer
 
 ## Numerical settling versus physical validity
 
-Force comparisons are withheld until both the required cases meet the settling criteria. This is only a heuristic for slowly changing mean model loads, not proof of physical convergence or a statistical uncertainty estimate. Time-averaged turbulent forces would require longer, independent sampling. The final rider is not guaranteed to have the least model force at this low Re.
+Provisional force comparisons appear after eight steps and are explicitly marked ≈ and provisional. The settled designation is reserved until the required cases meet the settling criteria. This is only a heuristic for slowly changing mean model loads, not proof of physical convergence or a statistical uncertainty estimate. Time-averaged turbulent forces would require longer, independent sampling. The final rider is not guaranteed to have the least model force at this low Re.
 
 Changing wind or viscosity invalidates the force history and smoothly changes boundary targets; it does not restart the distributions or step count. Changing geometry requires reinitialization. Any numerical failure pauses with an error and retains the last committed state rather than looping/resetting automatically.
 
@@ -58,3 +58,13 @@ Changing wind or viscosity invalidates the force history and smoothly changes bo
 Run `node tests.mjs`. Tests cover lattice moments, vector/unit conversion, a uniform moving flow over a matching moving road, zero aerodynamic force at rest, identical group/reference cases, uninterrupted condition changes, and the distinction between road velocity and ambient wind. These are numerical regression tests, not wind-tunnel validation.
 
 `validation.json` records the actual verification results for this revision. The deployment workflow runs the regression suite before publication. Full-scale geometry, mesh/domain independence, turbulence modeling and measured drag comparisons remain open acceptance criteria before the UI can claim realistic cycling predictions.
+
+## Smooth display and route to realism
+
+The renderer targets 60 display frames/s, caching the static scene and blending between actual field snapshots. The worker sends every computed group/reference step. Render FPS is measured independently from solver steps/s. This is interpolation of known numerical results, not a 60 Hz physics solver. Physical time advances only by the fixed solver dt, never by the render clock. Background tabs and slow devices may render less often.
+
+At the present dt, one physical second requires about 2,667 time steps; 60 display frames cannot replace those steps. A steady flow can look steady even with a continuously advancing solver. No decorative turbulence is added to hide that.
+
+The practical route to trustworthy cycling results is: (1) representative geometry and surface/wake/boundary-layer meshing; (2) air properties and Reynolds matching with validated turbulence/transition and near-wall treatment; (3) grid, domain, time-step and force-statistics sensitivity studies; (4) isolated and drafting wind-tunnel validation. More detailed unsteady displays require appropriate scale-resolving methods and sufficient spatial/temporal resolution.
+
+A browser GPU backend or WASM kernel could reduce numerical cost, but accelerating this low-Re model does not establish accuracy. A realistic product can render precomputed validated CFD fields smoothly, or use a separately validated surrogate for instant control changes while an expensive solver handles new cases. No such high-Re backend or validated surrogate is implemented here.

@@ -3,11 +3,11 @@ let group,reference,paused=false,timer=null,error=null,epoch=0;
 function emit(initial=false){if(!group)return;const velocity=group.snapshot(),gs=group.statistics(),rs=reference.statistics();
   const data={type:'frame',epoch,steps:group.steps,nx:group.nx,ny:group.ny,nz:group.nz,dx:group.dx,
     velocity,positions:group.positions,statistics:gs,reference:rs,units:group.units,diagnostics:group.diagnostics,
-    error,paused,conditions:group.config};if(initial)data.owner=group.owner;
+    error,paused,conditions:group.config,simulationTime:group.steps*group.units.dt};if(initial)data.owner=group.owner;
   postMessage(data,[velocity.buffer]);
 }
 function run(){timer=null;if(paused||!group)return;
-  try{for(let k=0;k<4;k++){group.step();reference.step();}emit();}
+  try{group.step();reference.step();emit();}
   catch(e){error=e.message;paused=true;emit();return;}
   timer=setTimeout(run,0);
 }

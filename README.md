@@ -8,6 +8,7 @@ Read [the physics audit](RESEARCH.md) for equations, research, corrected bugs an
 
 - `solver.mjs`: independent solver state, geometry, boundaries, forces and settling diagnostics.
 - `worker.mjs`: continuous group and reference computations outside the main thread.
-- `app.mjs`: visualisation, live controls and clearly defined comparisons.
+- `app.mjs`: cached scene, 60 FPS display target, interpolation between actual solver snapshots, live controls and comparisons.
+- `display.mjs`: display-only interpolation and provisional/settled comparison logic. Render FPS and physics steps/s are separate measurements. Provisional percentages appear after 8 steps; they are not validated road-cycling predictions.
 
 There are no empirical drafting percentages or rules that force a particular rider ranking. The current visualisation is a set of translucent sampled flow layers, not a volumetric renderer or evidence of resolved turbulence.
